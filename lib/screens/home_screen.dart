@@ -8,8 +8,10 @@ import 'package:flutter/services.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:badges/badges.dart';
 import 'package:grocery_application/models/cart_model.dart';
+import 'package:grocery_application/models/products_model.dart';
 import 'package:grocery_application/screens/authentication/login_screen.dart';
 import 'package:grocery_application/screens/authentication/register_screen.dart';
+import 'package:grocery_application/screens/bottom_pages/search_screen.dart';
 import 'package:grocery_application/screens/products/shopping_cart.dart';
 import 'package:grocery_application/screens/side_items/coupons.dart';
 import 'package:grocery_application/screens/side_items/product_request.dart';
@@ -17,6 +19,7 @@ import 'package:grocery_application/screens/side_items/settings.dart';
 import 'package:grocery_application/screens/side_items/track_order.dart';
 import 'package:grocery_application/utilities/config.dart';
 import 'package:grocery_application/utilities/database_utils.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'bottom_pages/favourites_page.dart';
 import 'bottom_pages/order_history.dart';
@@ -60,10 +63,11 @@ class _HomeScreenState extends State<HomeScreen> {
     _pageController.dispose();
   }
 
+
   _getPreferences() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
-      userName  = preferences.getString('user_name');
+      userName = preferences.getString('user_name');
       userId = preferences.getString('user_id');
       isLoggedIn = preferences.getBool('is_logged_in');
     });
@@ -106,42 +110,35 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              title: currentIndex != 3
-                  ? Container(
-                      height: appHeight / 20,
-                      width: appWidth / 1.5,
-                      decoration: BoxDecoration(
-                        color: Colors.white10,
-                        borderRadius: BorderRadius.circular(3.0),
-                      ),
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: appHeight * 0.015),
-                        child: TextField(
-                          controller: searchController,
-                          textInputAction: TextInputAction.next,
-                          keyboardType: TextInputType.emailAddress,
-                          style: TextStyle(
-                            fontSize: appHeight * 0.020,
-                            color: Colors.grey[500],
-                          ),
-                          decoration: InputDecoration.collapsed(
-                            hintText: 'Search store here ...',
-                            hintStyle: TextStyle(
-                              fontSize: appHeight * 0.020,
-                              color: Colors.grey[400],
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                  : Text(
-                      'Profile Information',
-                      style: TextStyle(
-                        fontSize: appHeight * 0.020,
-                        color: Colors.white54,
-                      ),
+              title: InkWell(
+                onTap: () => {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      opaque: false,
+                      pageBuilder: (BuildContext context, _, __) => SearchScreen(),
                     ),
+                  ),
+                },
+                child: Container(
+                  height: appHeight / 20,
+                  width: appWidth / 1.5,
+                  decoration: BoxDecoration(
+                    color: Colors.white10,
+                    borderRadius: BorderRadius.circular(50.0),
+                  ),
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: appHeight * 0.015),
+                      child: Text(
+                        'Search Store Here...',
+                        style: TextStyle(
+                          fontSize: appHeight * 0.020,
+                          color: Colors.grey[400],
+                        ),
+                      )),
+                ),
+              ),
               actions: [
                 Padding(
                   padding: EdgeInsets.only(right: appHeight * 0.015),
@@ -164,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         showBadge: snapshot.data!.length > 0 ? true : false,
                         child: InkWell(
                           onTap: () => {
-                            if (snapshot.data!.length > 0) {
+                            if (snapshot.data!.length > 0){
                                 Navigator.push(
                                   context,
                                   CupertinoPageRoute(
@@ -202,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           drawer: Container(
-            width: appWidth / 1.2,
+            width: appWidth / 1.4,
             color: Colors.transparent,
             child: Drawer(
               elevation: 0.5,
@@ -305,10 +302,14 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: appHeight * 0.02),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Image.asset('assets/images/app_logo.png')
+                    Container(
+                      height: appHeight / 8,
+                      width: appWidth / 3,
+                      child: Image.asset('assets/images/app_logo.png'),
+                    ),
                   ],
                 ),
               ),
@@ -319,28 +320,20 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               height: appHeight / 1.7,
               child: ListView.builder(
-                itemCount: 6,
+                itemCount: 3,
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
                 itemBuilder: (BuildContext context, int index) {
                   if (index == 0) {
-                    menuIcon = CupertinoIcons.question_square;
-                    menuName = 'Special Order';
-                  } else if (index == 1) {
                     menuIcon = CupertinoIcons.location_north_line;
                     menuName = 'Track order';
-                  } else if (index == 2) {
-                    menuIcon = CupertinoIcons.location;
-                    menuName = 'Coupons';
-                  } else if (index == 3) {
-                    menuIcon = CupertinoIcons.gear_alt;
-                    menuName = 'Settings';
-                  } else if (index == 4) {
+                  } else if (index == 1) {
                     menuIcon = CupertinoIcons.doc_on_clipboard;
                     menuName = 'Register';
-                  } else if (index == 5) {
-                    menuIcon = (isLoggedIn == true ? CupertinoIcons.square_arrow_left_fill : CupertinoIcons.square_arrow_right_fill);
+                  } else if (index == 2) {
+                    menuIcon =
+                        (isLoggedIn == true ? CupertinoIcons.square_arrow_left_fill : CupertinoIcons.square_arrow_right_fill);
                     menuName = (isLoggedIn == true ? 'Logout' : 'Login');
                   }
                   return InkWell(
@@ -397,7 +390,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.push(
         context,
         CupertinoPageRoute(
-          builder: (_) => ProductRequest(),
+          builder: (_) => TrackOrder(),
         ),
       );
     } else if (index == 1) {
@@ -405,38 +398,13 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.push(
         context,
         CupertinoPageRoute(
-          builder: (_) => TrackOrder(),
-        ),
-      );
-    } else if (index == 2) {
-      Navigator.pop(context);
-      Navigator.push(
-        context,
-        CupertinoPageRoute(
-          builder: (_) => Coupons(),
-        ),
-      );
-    } else if (index == 3) {
-      Navigator.pop(context);
-      Navigator.push(
-        context,
-        CupertinoPageRoute(
-          builder: (_) => Settings(),
-        ),
-      );
-
-    } else if (index == 4) {
-      Navigator.pop(context);
-      Navigator.push(
-        context,
-        CupertinoPageRoute(
           builder: (_) => RegisterScreen(),
         ),
       );
-    } else if (index == 5) {
-      if(isLoggedIn == true) {
-          preferences.clear();
-          SystemNavigator.pop(animated: true);
+    } else if (index == 2) {
+      if (isLoggedIn == true) {
+        preferences.clear();
+        SystemNavigator.pop(animated: true);
       } else {
         Navigator.push(
           context,
@@ -445,7 +413,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       }
-
     }
   }
 }

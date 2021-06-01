@@ -465,4 +465,16 @@ class DBProvider {
     }
   }
 
+  Future<List<ProductModel>?> searchProducts(String useSearch) async {
+    try {
+      final db = await database;
+      final result = await db!.rawQuery('SELECT * FROM Product WHERE name LIKE "%$useSearch%" ');
+      List<ProductModel> list = result.isNotEmpty ? result.map((e) => ProductModel.fromJson(e)).toList() : [];
+      return list;
+    } catch (Exception) {
+      log('Failed to search: $Exception');
+    }
+
+  }
+
 }

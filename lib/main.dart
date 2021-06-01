@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:grocery_application/providers/cart_counter.dart';
 import 'package:grocery_application/screens/splash_screen.dart';
+import 'package:grocery_application/utilities/database_utils.dart';
 import 'package:provider/provider.dart';
 
 void main()  {

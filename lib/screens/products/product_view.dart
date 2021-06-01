@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:grocery_application/models/cart_model.dart';
 import 'package:grocery_application/models/favourite_model.dart';
 import 'package:grocery_application/models/products_model.dart';
+import 'package:grocery_application/screens/home_screen.dart';
 import 'package:grocery_application/screens/products/checkout.dart';
 import 'package:grocery_application/screens/products/shopping_cart.dart';
 import 'package:grocery_application/utilities/database_utils.dart';
@@ -93,30 +94,33 @@ class _ProductViewState extends State<ProductView> {
                     ),
                     child: InkWell(
                       onTap: () => {
-                        if(snapshot.data.length > 0) {
-                          Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                              builder: (_) => ShoppingCart(),
+                        if (snapshot.data.length > 0)
+                          {
+                            Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (_) => ShoppingCart(),
+                              ),
                             ),
-                          ),
-                        } else {
-                          Flushbar(
-                            title: 'Notice!',
-                            message: 'No Products in Cart',
-                            padding: EdgeInsets.all(10),
-                            margin: EdgeInsets.all(10),
-                            borderRadius: BorderRadius.circular(5.0),
-                            backgroundColor: Color(0xFFe07a5f),
-                            icon: Icon(
-                              CupertinoIcons.xmark_circle_fill,
-                              size: appHeight * 0.025,
-                              color: Colors.white,
-                            ),
-                            flushbarPosition: FlushbarPosition.TOP,
-                            duration: Duration(seconds: 3),
-                          )..show(context),
-                        }
+                          }
+                        else
+                          {
+                            Flushbar(
+                              title: 'Notice!',
+                              message: 'No Products in Cart',
+                              padding: EdgeInsets.all(10),
+                              margin: EdgeInsets.all(10),
+                              borderRadius: BorderRadius.circular(5.0),
+                              backgroundColor: Color(0xFFe07a5f),
+                              icon: Icon(
+                                CupertinoIcons.xmark_circle_fill,
+                                size: appHeight * 0.025,
+                                color: Colors.white,
+                              ),
+                              flushbarPosition: FlushbarPosition.TOP,
+                              duration: Duration(seconds: 3),
+                            )..show(context),
+                          }
                       },
                       child: Icon(
                         CupertinoIcons.bag_fill,
@@ -313,11 +317,7 @@ class _ProductViewState extends State<ProductView> {
               SizedBox(width: appWidth * 0.02),
               Text(
                 'Add to Cart',
-                style: TextStyle(
-                    color: Colors.grey[800],
-                  fontSize: appHeight * 0.021,
-                  fontFamily: 'Google Sans'
-                ),
+                style: TextStyle(color: Colors.grey[800], fontSize: appHeight * 0.021, fontFamily: 'Google Sans'),
               ),
             ],
           ),
@@ -331,26 +331,26 @@ class _ProductViewState extends State<ProductView> {
       favourite = true;
     });
     favouriteItems = FavouriteModel(
-        id: widget.productDetails.id,
-        name: widget.productDetails.name,
-        slug : widget.productDetails.slug,
-        weight : widget.productDetails.weight,
-        weightMeasure : widget.productDetails.weightMeasure,
-        length : widget.productDetails.length,
-        width : widget.productDetails.width,
-        height : widget.productDetails.height,
-        lengthWidthHeightMeasure : widget.productDetails.lengthWidthHeightMeasure,
-        availability : widget.productDetails.availability,
-        availabilityDate : widget.productDetails.availabilityDate,
-        productSpecial : widget.productDetails.productSpecial,
-        published : widget.productDetails.published,
-        productPrice : widget.productDetails.productPrice,
-        productTaxId : widget.productDetails.productTaxId,
-        productDiscountId : widget.productDetails.productDiscountId,
-        currency : widget.productDetails.currency,
-        vendorId : widget.productDetails.vendorId,
-        currencyId :widget.productDetails.currencyId,
-        file : widget.productDetails.file,
+      id: widget.productDetails.id,
+      name: widget.productDetails.name,
+      slug: widget.productDetails.slug,
+      weight: widget.productDetails.weight,
+      weightMeasure: widget.productDetails.weightMeasure,
+      length: widget.productDetails.length,
+      width: widget.productDetails.width,
+      height: widget.productDetails.height,
+      lengthWidthHeightMeasure: widget.productDetails.lengthWidthHeightMeasure,
+      availability: widget.productDetails.availability,
+      availabilityDate: widget.productDetails.availabilityDate,
+      productSpecial: widget.productDetails.productSpecial,
+      published: widget.productDetails.published,
+      productPrice: widget.productDetails.productPrice,
+      productTaxId: widget.productDetails.productTaxId,
+      productDiscountId: widget.productDetails.productDiscountId,
+      currency: widget.productDetails.currency,
+      vendorId: widget.productDetails.vendorId,
+      currencyId: widget.productDetails.currencyId,
+      file: widget.productDetails.file,
     );
 
     DBProvider.db.createFavourite(favouriteItems);
@@ -369,7 +369,6 @@ class _ProductViewState extends State<ProductView> {
       flushbarPosition: FlushbarPosition.TOP,
       duration: Duration(seconds: 3),
     )..show(context);
-
   }
 
   _toCart() {
@@ -383,7 +382,13 @@ class _ProductViewState extends State<ProductView> {
     );
 
     DBProvider.db.createCart(cartItems);
-    Navigator.pop(context, true);
+
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) => HomeScreen(),
+      ),
+    );
 
     Flushbar(
       title: 'Success!',
