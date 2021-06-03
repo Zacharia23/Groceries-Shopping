@@ -54,11 +54,9 @@ class _StartPageState extends State<StartPage> {
           shrinkWrap: true,
           children: [
             SizedBox(height: appHeight * 0.030),
-            _featuredCategories(),
-            SizedBox(height: appHeight * 0.030),
             _bestSelling(),
             SizedBox(height: appHeight * 0.030),
-            _popularItems(),
+            _featuredCategories(),
             SizedBox(height: appHeight * 0.030),
           ],
         ),
@@ -80,7 +78,7 @@ class _StartPageState extends State<StartPage> {
         ),
         Divider(),
         Container(
-          height: appHeight / 5.5,
+
           width: appWidth,
           child: FutureBuilder(
             future: getCategories(),
@@ -93,15 +91,20 @@ class _StartPageState extends State<StartPage> {
                 );
               } else {
                 return AnimationLimiter(
-                  child: ListView.builder(
-                    itemCount: snapshot.data!.length,
+                  child: GridView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.zero,
                     shrinkWrap: true,
-                    physics: BouncingScrollPhysics(),
-                    scrollDirection: Axis.horizontal,
+                    itemCount: snapshot.data!.length,
+                    scrollDirection: Axis.vertical,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                    ),
                     itemBuilder: (BuildContext context, int index) {
                       return InkWell(
                         onTap: () => {
-                          if (snapshot.data![index].products.isEmpty){
+                          if (snapshot.data![index].products.isEmpty)
+                            {
                               Flushbar(
                                 title: 'Notice!',
                                 message: 'Category has no Products',
@@ -117,7 +120,9 @@ class _StartPageState extends State<StartPage> {
                                 flushbarPosition: FlushbarPosition.TOP,
                                 duration: Duration(seconds: 3),
                               )..show(context),
-                            } else {
+                            }
+                          else
+                            {
                               Navigator.push(
                                 context,
                                 CupertinoPageRoute(
@@ -130,7 +135,10 @@ class _StartPageState extends State<StartPage> {
                             }
                         },
                         child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: appHeight * 0.005),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: appHeight * 0.005,
+                            vertical: appHeight * 0.005,
+                          ),
                           child: AnimationConfiguration.staggeredList(
                             duration: Duration(milliseconds: 775),
                             position: index,
@@ -151,7 +159,7 @@ class _StartPageState extends State<StartPage> {
                                       Padding(
                                         padding: EdgeInsets.all(appHeight * 0.005),
                                         child: Container(
-                                          height: appHeight / 8,
+                                          height: appHeight / 6,
                                           width: appWidth,
                                           child: ClipRRect(
                                             borderRadius: BorderRadius.circular(3.0),
@@ -162,11 +170,12 @@ class _StartPageState extends State<StartPage> {
                                           ),
                                         ),
                                       ),
+                                      SizedBox(height: appHeight * 0.005),
                                       Text(
                                         '${snapshot.data![index].name}',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          fontSize: appHeight * 0.017,
+                                          fontSize: appHeight * 0.018,
                                           color: Colors.grey[700],
                                         ),
                                       ),
@@ -194,27 +203,19 @@ class _StartPageState extends State<StartPage> {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Icon(
-              CupertinoIcons.flame,
-              color: Colors.grey[700],
-            ),
-            SizedBox(width: appWidth * 0.020),
-            Text(
-              'Best Selling Items',
-              style: TextStyle(
-                fontSize: appHeight * 0.020,
-                color: Colors.grey[700],
-              ),
-            ),
-          ],
+        SizedBox(width: appWidth * 0.020),
+        Text(
+          'Best Selling Products',
+          style: TextStyle(
+            fontSize: appHeight * 0.020,
+            color: Colors.grey[700],
+          ),
         ),
         Divider(),
         Container(
-          height: appHeight / 8,
+          height: appHeight / 6,
           width: appWidth,
+          // color: Colors.orange,
           child: FutureBuilder(
             future: getNewArrival(),
             builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
@@ -263,7 +264,7 @@ class _StartPageState extends State<StartPage> {
                                 child: Stack(
                                   children: [
                                     Container(
-                                      height: appHeight / 8,
+                                      height: appHeight / 6,
                                       width: appWidth / 2,
                                       decoration: BoxDecoration(
                                         color: Colors.grey[200],
@@ -333,153 +334,6 @@ class _StartPageState extends State<StartPage> {
                                       ),
                                     ),
                                   ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              }
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  _popularItems() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Products',
-          style: TextStyle(
-            fontSize: appHeight * 0.020,
-            color: Colors.grey[700],
-          ),
-        ),
-        Divider(),
-        Container(
-          width: appWidth,
-          child: FutureBuilder(
-            future: getPopular(),
-            builder: (BuildContext context, AsyncSnapshot<List<ProductModel>> snapshot) {
-              if (!snapshot.hasData) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.0,
-                    color: Colors.white24,
-                  ),
-                );
-              } else {
-                return AnimationLimiter(
-                  child: GridView.builder(
-                    physics: BouncingScrollPhysics(),
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.length,
-                    scrollDirection: Axis.vertical,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                    ),
-                    itemBuilder: (BuildContext context, int index) {
-                      productPrice = double.parse(snapshot.data![index].productPrice);
-                      if ('${snapshot.data![index].currency}' == 'Tanzanian shilling') {
-                        currency = 'TZS';
-                      } else {
-                        currency = 'USD';
-                      }
-
-                      return AnimationConfiguration.staggeredGrid(
-                        position: index,
-                        duration: Duration(milliseconds: 775),
-                        columnCount: 2,
-                        child: SlideAnimation(
-                          horizontalOffset: 50,
-                          child: FadeInAnimation(
-                            child: Padding(
-                              padding: EdgeInsets.all(appHeight * 0.005),
-                              child: InkWell(
-                                onTap: () => {
-                                  Navigator.push(
-                                    context,
-                                    CupertinoPageRoute(
-                                      builder: (_) => ProductView(
-                                        productDetails: snapshot.data![index],
-                                      ),
-                                    ),
-                                  ),
-                                },
-                                child: Container(
-                                  height: appHeight / 15,
-                                  width: appWidth / 2,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[200],
-                                    borderRadius: BorderRadius.circular(5.0),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.all(appHeight * 0.005),
-                                        child: Container(
-                                          height: appHeight / 8,
-                                          width: appWidth / 2,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[100],
-                                            borderRadius: BorderRadius.circular(5.0),
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(5.0),
-                                            child: Hero(
-                                              tag: snapshot.data![index].file,
-                                              child: Image.network(
-                                                '${snapshot.data![index].file}',
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: appHeight * 0.007),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: appHeight * 0.008),
-                                        child: Text(
-                                          '${snapshot.data![index].name}',
-                                          style: TextStyle(
-                                            color: Colors.grey[600],
-                                            fontSize: appHeight * 0.021,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: appHeight * 0.010),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: appHeight * 0.008),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              '$currency ${productPrice.ceil()}',
-                                              style: TextStyle(
-                                                color: Color(0xFF124f23),
-                                                fontSize: appHeight * 0.019,
-                                              ),
-                                            ),
-                                            Icon(
-                                              CupertinoIcons.star_lefthalf_fill,
-                                              color: Colors.orange,
-                                              size: appHeight * 0.020,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
                                 ),
                               ),
                             ),
@@ -613,16 +467,6 @@ class _StartPageState extends State<StartPage> {
   }
 
   Future<List<ProductModel>> getNewArrival() async {
-    List<ProductModel> _products = [];
-
-    for (var newProducts in newArrivalObject) {
-      ProductModel productModel = ProductModel.fromJson(newProducts);
-      _products.add(productModel);
-    }
-    return _products;
-  }
-
-  Future<List<ProductModel>> getPopular() async {
     List<ProductModel> _products = [];
 
     for (var newProducts in popularObject) {

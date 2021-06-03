@@ -5,7 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:grocery_application/helpers/dialog_indicator.dart';
+import 'package:grocery_application/screens/authentication/register_screen.dart';
 import 'package:grocery_application/screens/home_screen.dart';
+import 'package:grocery_application/screens/products/checkout.dart';
 import 'package:grocery_application/utilities/config.dart';
 import 'package:grocery_application/widgets/failed_dialog.dart';
 import 'package:grocery_application/widgets/failed_login_dialog.dart';
@@ -24,6 +26,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
   var appHeight;
   var appWidth;
+
+  var fromCart;
+
+  @override
+  void initState() {
+    super.initState();
+    _getPreferences();
+  }
+
+  _getPreferences() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    fromCart = preferences.getBool('in_cart');
+    print(fromCart);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -193,19 +210,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       onTap: () => {},
                       splashColor: Colors.grey[400],
                       child: Text(
-                        'Forgot Password?'.toUpperCase(),
+                        ''.toUpperCase(),
                         style: TextStyle(
                           color: Color(0xFF588157),
                           fontSize: appHeight * 0.017,
                         ),
                       ),
                     ),
-                    SizedBox(height: appHeight * 0.03),
+                    SizedBox(height: appHeight * 0.01),
                     Container(
                       height: appHeight / 15,
                       width: appWidth / 1.1,
                       decoration: BoxDecoration(
-                        color: Color(0xFF588157),
+                        color: Color(0xFFffa62b),
                         borderRadius: BorderRadius.circular(3.0),
                       ),
                       child: TextButton(
@@ -218,12 +235,45 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Text(
                           'Login'.toUpperCase(),
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Colors.black,
                             fontSize: appHeight * 0.020,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.5,
+                            fontFamily: 'Google Sans',
                           ),
                         ),
+                      ),
+                    ),
+                    SizedBox(height: appHeight * 0.02),
+                    InkWell(
+                      onTap: () => {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (_) => RegisterScreen(),
+                          ),
+                        ),
+                      },
+                      splashColor: Colors.grey[400],
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Don\'t have Mesula Account',
+                            style: TextStyle(
+                              color: Colors.grey[700],
+                              fontSize: appHeight * 0.016,
+                            ),
+                          ),
+                          SizedBox(width: appWidth * 0.02),
+                          Text(
+                            'Register Here'.toUpperCase(),
+                            style: TextStyle(
+                              color: Color(0xFF588157),
+                              fontSize: appHeight * 0.016,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -308,12 +358,21 @@ class _LoginScreenState extends State<LoginScreen> {
         preferences.setString("user_id", data['id']);
         preferences.setBool('is_logged_in', true);
 
-        Navigator.push(
-          context,
-          CupertinoPageRoute(
-            builder: (_) => HomeScreen(),
-          ),
-        );
+        if(fromCart == true || fromCart != null) {
+          Navigator.push(
+            context,
+            CupertinoPageRoute(
+              builder: (_) => Checkout(),
+            ),
+          );
+        } else {
+          Navigator.push(
+            context,
+            CupertinoPageRoute(
+              builder: (_) => HomeScreen(),
+            ),
+          );
+        }
 
       } else {
         DialogIndicator(context).hideOpenDialog();

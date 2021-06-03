@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   startTimer() {
-    new Timer(Duration(seconds: 5), fetchData);
+    new Timer(Duration(seconds: 2), fetchData);
   }
 
   @override

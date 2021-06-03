@@ -37,6 +37,7 @@ dependencies:
   provider: ^5.0.0
   google_nav_bar: ^5.0.5
   badges: ^2.0.1
+  webview_flutter: ^2.0.8
 
 
 dev_dependencies:

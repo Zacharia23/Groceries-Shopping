@@ -99,7 +99,7 @@ class _LandingScreenState extends State<LandingScreen> {
                         ),
                       },
                       child: Text(
-                        'Start Shopping as Guest'.toUpperCase(),
+                        'Start Shopping'.toUpperCase(),
                         style: TextStyle(
                           fontSize: appHeight * 0.018,
                           color: Color(0xFF124f23),
@@ -108,7 +108,7 @@ class _LandingScreenState extends State<LandingScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: appHeight * 0.01),
+                /*SizedBox(height: appHeight * 0.01),
                 SlideUp(
                   delay: 1050,
                   child: InkWell(
@@ -128,8 +128,8 @@ class _LandingScreenState extends State<LandingScreen> {
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: appHeight * 0.02),
+                ),*/
+                SizedBox(height: appHeight * 0.06),
                 SlideUp(
                   delay: 1100,
                   child: Text(
@@ -140,6 +140,7 @@ class _LandingScreenState extends State<LandingScreen> {
                     ),
                   ),
                 ),
+                SizedBox(height: appHeight * 0.01),
                 SlideUp(
                   delay: 1100,
                   child: Image.asset('assets/images/bannerlogo.png'),

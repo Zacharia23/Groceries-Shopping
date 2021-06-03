@@ -278,7 +278,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       height: appHeight / 15,
                       width: appWidth / 1.1,
                       decoration: BoxDecoration(
-                        color: Color(0xFF588157),
+                        color: Color(0xFFffa62b),
                         borderRadius: BorderRadius.circular(3.0),
                       ),
                       child: TextButton(
@@ -290,7 +290,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         child: Text(
                           'Register'.toUpperCase(),
-                          style: TextStyle(color: Colors.white, fontSize: appHeight * 0.021, fontFamily: 'Google Sans'),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: appHeight * 0.021,
+                            fontFamily: 'Google Sans',
+                          ),
                         ),
                       ),
                     ),
@@ -411,7 +415,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             code: code,
           ),
         );
-
       } else {
         DialogIndicator(context).hideOpenDialog();
 

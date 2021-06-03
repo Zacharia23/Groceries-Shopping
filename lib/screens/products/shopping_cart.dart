@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:grocery_application/models/cart_model.dart';
 import 'package:grocery_application/utilities/database_utils.dart';
+import 'package:grocery_application/widgets/confirmation_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'checkout.dart';
 
@@ -20,8 +22,28 @@ class _ShoppingCartState extends State<ShoppingCart> {
   var appWidth;
 
   int sum = 0;
-  var productTotal = 0;
-  var subTotal = 0;
+  int productTotal = 0;
+  int subTotal = 0;
+  var loggedIn;
+
+
+  @override
+  void initState() {
+    _getPreferences();
+    setPreference();
+    super.initState();
+  }
+
+  setPreference() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setBool("in_cart", true);
+  }
+
+
+  _getPreferences() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    loggedIn = preferences.getBool('is_logged_in');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +126,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
         child: FutureBuilder(
           future: DBProvider.db.getCartItems(),
           builder: (BuildContext context, AsyncSnapshot<List<CartModel>?> snapshot) {
-            if(!snapshot.hasData) {
+            if (!snapshot.hasData) {
               return Center(
                 child: CircularProgressIndicator(
                   strokeWidth: 2.0,
@@ -174,21 +196,29 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                             color: Colors.grey[600],
                                           ),
                                         ),
-                                        Text(
-                                          'Unit Price: Tshs ${snapshot.data![index].productPrice}',
-                                          style: TextStyle(
-                                            fontSize: appHeight * 0.019,
-                                            color: Colors.grey[400],
-                                          ),
+                                        SizedBox(height: appHeight * 0.005),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '@ Price: TZS ${snapshot.data![index].productPrice}',
+                                              style: TextStyle(
+                                                fontSize: appHeight * 0.017,
+                                                color: Colors.grey[400],
+                                              ),
+                                            ),
+                                            SizedBox(width: appWidth * 0.06),
+                                            Text(
+                                              'SKU: ${snapshot.data![index].sku}',
+                                              style: TextStyle(
+                                                fontSize: appHeight * 0.017,
+                                                color: Colors.grey[400],
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        Text(
-                                          'SKU: ${snapshot.data![index].sku}',
-                                          style: TextStyle(
-                                            fontSize: appHeight * 0.017,
-                                            color: Colors.grey[400],
-                                          ),
-                                        ),
-                                        SizedBox(height: appHeight * 0.01),
+                                        SizedBox(height: appHeight * 0.015),
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.end,
                                           crossAxisAlignment: CrossAxisAlignment.end,
@@ -199,7 +229,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                                 'Tshs ' + '$productTotal',
                                                 style: TextStyle(
                                                   fontSize: appHeight * 0.023,
-                                                  color: Color(0xFF124f23),
+                                                  color: Color(0xFFca6702),
                                                 ),
                                               ),
                                             ),
@@ -348,26 +378,21 @@ class _ShoppingCartState extends State<ShoppingCart> {
             Positioned(
               bottom: 0,
               child: Container(
-                height: appHeight / 10,
+                height: appHeight / 12,
                 width: appWidth,
                 decoration: BoxDecoration(
                   color: Color(0xFFffa62b),
                 ),
                 child: TextButton(
                   onPressed: () => {
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (_) => Checkout(),
-                      ),
-                    ),
+                    _toCheckout(),
                   },
                   child: Text(
                     'Proceed to Checkout',
                     style: TextStyle(
-                        color: Colors.grey[800],
-                        fontSize: appHeight * 0.020,
-                        fontFamily: 'Google Sans'
+                      color: Colors.grey[800],
+                      fontSize: appHeight * 0.020,
+                      fontFamily: 'Google Sans',
                     ),
                   ),
                 ),
@@ -377,5 +402,24 @@ class _ShoppingCartState extends State<ShoppingCart> {
         ),
       ),
     );
+  }
+
+  _toCheckout() async {
+
+    if (loggedIn == false || loggedIn == null) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => ConfirmationDialog(),
+      );
+    } else {
+      Navigator.push(
+        context,
+        CupertinoPageRoute(
+          builder: (_) => Checkout(),
+        ),
+      );
+
+    }
   }
 }

@@ -3,11 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:grocery_application/models/history_model.dart';
 import 'package:grocery_application/screens/home_screen.dart';
 import 'package:grocery_application/utilities/database_utils.dart';
+import 'package:grocery_application/widgets/payment_dialog.dart';
 
 class ResponseDialog extends StatefulWidget {
   final dynamic invoiceNumber;
   final dynamic orderNumber;
-  const ResponseDialog({this.invoiceNumber, this.orderNumber, Key? key}) : super(key: key);
+  final dynamic payMethod;
+  final dynamic amount;
+  final dynamic firstName;
+  final dynamic lastName;
+  final dynamic email;
+  final dynamic phone;
+
+  const ResponseDialog({
+    this.invoiceNumber,
+    this.orderNumber,
+    this.payMethod,
+    this.amount,
+    this.firstName,
+    this.lastName,
+    this.email,
+    this.phone,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _ResponseDialogState createState() => _ResponseDialogState();
@@ -32,6 +50,7 @@ class _ResponseDialogState extends State<ResponseDialog> with TickerProviderStat
       // setState(() {});
     });
     controller.forward();
+    print(widget.payMethod);
   }
 
   @override
@@ -47,7 +66,7 @@ class _ResponseDialogState extends State<ResponseDialog> with TickerProviderStat
           child: Stack(
             children: [
               Container(
-                height: appHeight / 4.3,
+                height: appHeight / 3.7,
                 width: appWidth / 1.15,
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -74,26 +93,62 @@ class _ResponseDialogState extends State<ResponseDialog> with TickerProviderStat
                       ),
                     ),
                     SizedBox(height: appHeight * 0.010),
-                    Text(
-                      'Order #: ${widget.orderNumber}'.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: appHeight * 0.021,
-                        color: Color(0xFFfca311),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: appHeight * 0.03),
+                      child: Divider(),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: appHeight * 0.03),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Order No',
+                            style: TextStyle(
+                              fontSize: appHeight * 0.015,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                          Text(
+                            'Invoice No',
+                            style: TextStyle(
+                              fontSize: appHeight * 0.015,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(height: appHeight * 0.010),
-                    Text(
-                      'Invoice #: ${widget.invoiceNumber}'.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: appHeight * 0.021,
-                        color: Color(0xFFfca311),
+                    SizedBox(height: appHeight * 0.003),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: appHeight * 0.03),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${widget.orderNumber}'.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: appHeight * 0.021,
+                              color: Color(0xFFee9b00),
+                            ),
+                          ),
+                          Text(
+                            '${widget.invoiceNumber}'.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: appHeight * 0.021,
+                              color: Color(0xFFee9b00),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
               Positioned(
-                top: appHeight / 5.6,
+                top: appHeight / 5,
                 left: 0,
                 right: 0,
                 bottom: 0,
@@ -112,9 +167,9 @@ class _ResponseDialogState extends State<ResponseDialog> with TickerProviderStat
                       _saveOrder(),
                     },
                     child: Text(
-                      'OK',
+                      widget.payMethod == '3' ? 'Proceed to Payment' : 'OK',
                       style: TextStyle(
-                        fontSize: appHeight * 0.022,
+                        fontSize: appHeight * 0.020,
                         color: Colors.white,
                       ),
                     ),
@@ -140,14 +195,30 @@ class _ResponseDialogState extends State<ResponseDialog> with TickerProviderStat
     );
 
     DBProvider.db.createHistory(historyItems);
-
-    Navigator.push(
-      context,
-      CupertinoPageRoute(
-        builder: (_) => HomeScreen(),
-      ),
-    ).then((value) {
-      setState(() {});
-    });
+    if (widget.payMethod == '3') {
+      Navigator.pop(context);
+      showDialog(
+        barrierDismissible: false,
+        barrierColor: Colors.black26,
+        context: context,
+        builder: (_) => PaymentDialog(
+          amount: widget.amount,
+          firstName: widget.firstName,
+          lastName: widget.lastName,
+          email: widget.email,
+          phone: widget.phone,
+          orderNumber: widget.orderNumber,
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        CupertinoPageRoute(
+          builder: (_) => HomeScreen(),
+        ),
+      ).then((value) {
+        setState(() {});
+      });
+    }
   }
 }

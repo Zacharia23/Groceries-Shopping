@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:another_flushbar/flushbar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -40,6 +39,7 @@ class _CheckoutState extends State<Checkout> {
   var shippingID;
   var paymentID;
   var shippingFlag;
+  var setShipPrice = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -62,16 +62,6 @@ class _CheckoutState extends State<Checkout> {
             fontFamily: 'Google Sans',
           ),
         ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: appHeight * 0.013),
-            child: Icon(
-              CupertinoIcons.ellipsis_vertical,
-              size: 20,
-              color: Colors.grey[200],
-            ),
-          ),
-        ],
       ),
       body: Stack(
         children: [
@@ -140,7 +130,7 @@ class _CheckoutState extends State<Checkout> {
                     }),
                   },
                   child: Padding(
-                    padding: EdgeInsets.all(appHeight * 0.005),
+                    padding: EdgeInsets.all(appHeight * 0.01),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -202,7 +192,7 @@ class _CheckoutState extends State<Checkout> {
                       children: [
                         SizedBox(height: appHeight * 0.005),
                         Text(
-                          '${billingInfo['first_name']} ${billingInfo['middle_name']} ${billingInfo['last_name']}',
+                          '${billingInfo['first_name']} ${billingInfo['mid_name']} ${billingInfo['last_name']}',
                           style: TextStyle(
                             fontSize: appHeight * 0.020,
                             color: Colors.blueGrey,
@@ -542,6 +532,11 @@ class _CheckoutState extends State<Checkout> {
                       onChanged: (newValue) {
                         setState(() {
                           _shippingMethod = newValue;
+                          if(shippingID == "3") {
+                            setShipPrice = int.tryParse(shippingPrice)!;
+                          } else {
+                            setShipPrice = 0;
+                          }
                         });
                       },
                     ),
@@ -742,7 +737,7 @@ class _CheckoutState extends State<Checkout> {
                           ),
                         ),
                         Text(
-                          '${_shippingMethod == 'Delivery' ? shippingPrice : '0'}',
+                          '$setShipPrice',
                           style: TextStyle(
                             fontSize: appHeight * 0.020,
                             color: Colors.grey[600],
@@ -769,7 +764,7 @@ class _CheckoutState extends State<Checkout> {
                               return Text('-');
                             } else {
                               return Text(
-                                'Tshs ' + '${snapshot.data[0]['total'] + ( shippingPrice == null ? 0  : int.tryParse(shippingPrice))}',
+                                'Tshs ' + '${snapshot.data[0]['total'] + setShipPrice}',
                                 style: TextStyle(
                                   fontSize: appHeight * 0.020,
                                   color: Colors.grey[800],
@@ -787,7 +782,7 @@ class _CheckoutState extends State<Checkout> {
               Positioned(
                 bottom: 0,
                 child: Container(
-                  height: appHeight / 10,
+                  height: appHeight / 12,
                   width: appWidth,
                   decoration: BoxDecoration(
                     color: Color(0xFFffa62b),
@@ -797,7 +792,7 @@ class _CheckoutState extends State<Checkout> {
                       _validateData();
                     },
                     child: Text(
-                      'Confirm Purchase'.toUpperCase(),
+                      'Confirm Purchase',
                       style: TextStyle(
                         color: Colors.grey[800],
                         fontSize: appHeight * 0.021,
@@ -907,6 +902,12 @@ class _CheckoutState extends State<Checkout> {
 
         var orderNumber = data['order_number'];
         var invoiceNumber = data['invoice_number'];
+        var amount = data['amount'];
+        var firstName = data['fname'];
+        var lastName = data['lname'];
+        var email = data['email'];
+        var phone = data['phone'];
+
         print('$invoiceNumber  $orderNumber');
 
         showDialog(
@@ -915,6 +916,12 @@ class _CheckoutState extends State<Checkout> {
           builder: (_) => ResponseDialog(
             invoiceNumber: invoiceNumber,
             orderNumber: orderNumber,
+            payMethod: paymentID,
+            amount: amount,
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            phone: phone,
           ),
         );
 

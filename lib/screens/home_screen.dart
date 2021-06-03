@@ -13,6 +13,7 @@ import 'package:grocery_application/screens/authentication/login_screen.dart';
 import 'package:grocery_application/screens/authentication/register_screen.dart';
 import 'package:grocery_application/screens/bottom_pages/search_screen.dart';
 import 'package:grocery_application/screens/products/shopping_cart.dart';
+import 'package:grocery_application/screens/side_items/b2b_page.dart';
 import 'package:grocery_application/screens/side_items/coupons.dart';
 import 'package:grocery_application/screens/side_items/product_request.dart';
 import 'package:grocery_application/screens/side_items/settings.dart';
@@ -84,6 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: WillPopScope(
         onWillPop: () async {
+          DBProvider.db.removeAllCartItems();
           SystemNavigator.pop();
           return false;
         },
@@ -320,7 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               height: appHeight / 1.7,
               child: ListView.builder(
-                itemCount: 3,
+                itemCount: 4,
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
@@ -329,9 +331,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     menuIcon = CupertinoIcons.location_north_line;
                     menuName = 'Track order';
                   } else if (index == 1) {
+                    menuIcon = CupertinoIcons.bold;
+                    menuName = 'B2B';
+                  } else if (index == 2) {
                     menuIcon = CupertinoIcons.doc_on_clipboard;
                     menuName = 'Register';
-                  } else if (index == 2) {
+                  } else if (index == 3) {
                     menuIcon =
                         (isLoggedIn == true ? CupertinoIcons.square_arrow_left_fill : CupertinoIcons.square_arrow_right_fill);
                     menuName = (isLoggedIn == true ? 'Logout' : 'Login');
@@ -398,12 +403,21 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.push(
         context,
         CupertinoPageRoute(
-          builder: (_) => RegisterScreen(),
+          builder: (_) => B2B(),
         ),
       );
     } else if (index == 2) {
+      Navigator.pop(context);
+      Navigator.push(
+        context,
+        CupertinoPageRoute(
+          builder: (_) => RegisterScreen(),
+        ),
+      );
+    } else if (index == 3) {
       if (isLoggedIn == true) {
         preferences.clear();
+        DBProvider.db.removeAllCartItems();
         SystemNavigator.pop(animated: true);
       } else {
         Navigator.push(

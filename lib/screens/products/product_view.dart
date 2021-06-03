@@ -298,7 +298,7 @@ class _ProductViewState extends State<ProductView> {
     return Positioned(
       bottom: 0.0,
       child: Container(
-        height: appHeight / 9,
+        height: appHeight / 12,
         width: appWidth,
         decoration: BoxDecoration(
           color: Color(0xFFffa62b),
@@ -317,7 +317,11 @@ class _ProductViewState extends State<ProductView> {
               SizedBox(width: appWidth * 0.02),
               Text(
                 'Add to Cart',
-                style: TextStyle(color: Colors.grey[800], fontSize: appHeight * 0.021, fontFamily: 'Google Sans'),
+                style: TextStyle(
+                  color: Colors.grey[800],
+                  fontSize: appHeight * 0.021,
+                  fontFamily: 'Google Sans',
+                ),
               ),
             ],
           ),

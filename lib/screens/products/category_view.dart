@@ -200,7 +200,7 @@ class _CategoryViewState extends State<CategoryView> {
                             Padding(
                               padding: EdgeInsets.all(appHeight * 0.005),
                               child: Container(
-                                height: appHeight / 8,
+                                height: appHeight / 9,
                                 width: appWidth / 2,
                                 decoration: BoxDecoration(
                                   color: Colors.grey[100],
@@ -225,7 +225,7 @@ class _CategoryViewState extends State<CategoryView> {
                                 '${widget.products[index].name}',
                                 style: TextStyle(
                                   color: Colors.grey[600],
-                                  fontSize: appHeight * 0.019,
+                                  fontSize: appHeight * 0.017,
                                 ),
                               ),
                             ),
