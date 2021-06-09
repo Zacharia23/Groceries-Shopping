@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -418,7 +419,12 @@ class _HomeScreenState extends State<HomeScreen> {
       if (isLoggedIn == true) {
         preferences.clear();
         DBProvider.db.removeAllCartItems();
-        SystemNavigator.pop(animated: true);
+        // Navigator.pop(context);
+       if(Platform.isAndroid) {
+         SystemNavigator.pop(animated: true);
+       } else if(Platform.isIOS) {
+         exit(0);
+       }
       } else {
         Navigator.push(
           context,

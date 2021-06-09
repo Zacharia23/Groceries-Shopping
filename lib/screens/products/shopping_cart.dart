@@ -1,13 +1,16 @@
+import 'dart:convert';
 import 'dart:developer';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:grocery_application/helpers/dialog_indicator.dart';
 import 'package:grocery_application/models/cart_model.dart';
 import 'package:grocery_application/utilities/database_utils.dart';
 import 'package:grocery_application/widgets/confirmation_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:grocery_application/utilities/config.dart';
 import 'checkout.dart';
 
 class ShoppingCart extends StatefulWidget {
@@ -25,7 +28,9 @@ class _ShoppingCartState extends State<ShoppingCart> {
   int productTotal = 0;
   int subTotal = 0;
   var loggedIn;
-
+  var data;
+  var shippingData;
+  var billingData;
 
   @override
   void initState() {
@@ -38,7 +43,6 @@ class _ShoppingCartState extends State<ShoppingCart> {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     preferences.setBool("in_cart", true);
   }
-
 
   _getPreferences() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -385,7 +389,8 @@ class _ShoppingCartState extends State<ShoppingCart> {
                 ),
                 child: TextButton(
                   onPressed: () => {
-                    _toCheckout(),
+                    _getUserInformation(),
+                    // _toCheckout(),
                   },
                   child: Text(
                     'Proceed to Checkout',
@@ -404,22 +409,77 @@ class _ShoppingCartState extends State<ShoppingCart> {
     );
   }
 
+  _getUserInformation() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    var userID = preferences.getString('user_id');
+
+    String url = Config.endPoint;
+    String reqKey = Config.requestKey;
+    Dio _dio = Dio();
+    Options options = Options();
+    options.contentType = 'application/x-www-form-urlencoded';
+
+    DialogIndicator(context).showLoadingIndicator();
+
+    try {
+      Response response = await _dio.post(
+        url,
+        data: "$reqKey=info&user_id=$userID",
+        options: options,
+      );
+
+      print('Response: $response');
+
+      var stringResponse = response.toString();
+      var decodedResponse = jsonDecode(stringResponse);
+      var result = decodedResponse['response'];
+      var code = result['code'];
+      var desc = result['desc'];
+
+      if(code == 200) {
+        DialogIndicator(context).hideOpenDialog();
+
+        data = decodedResponse['data'];
+        billingData = data['billing_details'];
+        shippingData = data['shipping_details'];
+        log('$billingData $shippingData');
+
+        if (loggedIn == false || loggedIn == null) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (_) => ConfirmationDialog(),
+          );
+        } else {
+          Navigator.push(
+            context,
+            CupertinoPageRoute(
+              builder: (_) => Checkout(
+                shippingData: shippingData,
+                billingData: billingData,
+              ),
+            ),
+          );
+        }
+
+      } else {
+        DialogIndicator(context).hideOpenDialog();
+
+        log('$desc');
+      }
+
+    } on DioError catch (Exception) {
+      DialogIndicator(context).hideOpenDialog();
+
+      log('Req Error: $Exception');
+    } catch (Exception) {
+      DialogIndicator(context).hideOpenDialog();
+
+      log('Something Happened: $Exception');
+    }
+  }
+
   _toCheckout() async {
 
-    if (loggedIn == false || loggedIn == null) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => ConfirmationDialog(),
-      );
-    } else {
-      Navigator.push(
-        context,
-        CupertinoPageRoute(
-          builder: (_) => Checkout(),
-        ),
-      );
-
-    }
   }
 }

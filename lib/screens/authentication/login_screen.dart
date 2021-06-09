@@ -340,7 +340,7 @@ class _LoginScreenState extends State<LoginScreen> {
         options: options,
       );
 
-      log('Res: $response');
+      log('Res_a: $response');
 
       var stringResponse = response.toString();
       var decodedResponse = jsonDecode(stringResponse);
@@ -354,8 +354,10 @@ class _LoginScreenState extends State<LoginScreen> {
         DialogIndicator(context).hideOpenDialog();
 
         SharedPreferences preferences = await SharedPreferences.getInstance();
-        preferences.setString('user_name', data['name']);
+        preferences.setString('user_name', data['user_name']);
         preferences.setString("user_id", data['id']);
+        preferences.setString("customer_number", data['customer_number']);
+
         preferences.setBool('is_logged_in', true);
 
         if(fromCart == true || fromCart != null) {

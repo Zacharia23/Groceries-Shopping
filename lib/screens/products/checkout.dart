@@ -13,9 +13,17 @@ import 'package:grocery_application/widgets/billing_info_dialog.dart';
 import 'package:grocery_application/widgets/response_dialog.dart';
 import 'package:grocery_application/widgets/shipping_info_dialog.dart';
 import 'package:grocery_application/utilities/config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Checkout extends StatefulWidget {
-  const Checkout({Key? key}) : super(key: key);
+  final dynamic shippingData;
+  final dynamic billingData;
+
+  const Checkout({
+    this.shippingData,
+    this.billingData,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _CheckoutState createState() => _CheckoutState();
@@ -40,6 +48,26 @@ class _CheckoutState extends State<Checkout> {
   var paymentID;
   var shippingFlag;
   var setShipPrice = 0;
+
+  String userName = '';
+  String userID = '';
+  String customerNumber = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getPreferences();
+    _checkBilling();
+  }
+
+  void _checkBilling() {
+    if (widget.billingData != null){
+      log('Billing is not null');
+    } else {
+      log('Billing is null');
+    }
+    log('Shipping: ${widget.shippingData}');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +135,7 @@ class _CheckoutState extends State<Checkout> {
                   color: Colors.grey[700],
                 ),
               ),
-              Container(
+             widget.billingData == null ? Container(
                 decoration: BoxDecoration(
                   color: Color(0xFF124f23).withOpacity(0.2),
                   borderRadius: BorderRadius.circular(3.0),
@@ -151,10 +179,11 @@ class _CheckoutState extends State<Checkout> {
                     ),
                   ),
                 ),
-              ),
+              ) : Container(),
             ],
           ),
           SizedBox(height: appHeight * 0.010),
+          _billingView(),
           hasBilling == false
               ? Center(
                   child: Column(
@@ -195,7 +224,7 @@ class _CheckoutState extends State<Checkout> {
                           '${billingInfo['first_name']} ${billingInfo['mid_name']} ${billingInfo['last_name']}',
                           style: TextStyle(
                             fontSize: appHeight * 0.020,
-                            color: Colors.blueGrey,
+                            color: Colors.grey[700],
                           ),
                         ),
                         SizedBox(height: appHeight * 0.005),
@@ -289,6 +318,14 @@ class _CheckoutState extends State<Checkout> {
         ],
       ),
     );
+  }
+
+  _billingView() {
+    if(widget.billingData != null) {
+      return Text('With Billing');
+    } else {
+      return Text('No Billing');
+    }
   }
 
   _shippingDetails() {
@@ -532,7 +569,7 @@ class _CheckoutState extends State<Checkout> {
                       onChanged: (newValue) {
                         setState(() {
                           _shippingMethod = newValue;
-                          if(shippingID == "3") {
+                          if (shippingID == "3") {
                             setShipPrice = int.tryParse(shippingPrice)!;
                           } else {
                             setShipPrice = 0;
@@ -863,6 +900,15 @@ class _CheckoutState extends State<Checkout> {
     }
   }
 
+  _getPreferences() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      customerNumber = preferences.getString("customer_number")!;
+      userID = preferences.getString("user_id")!;
+      userName = preferences.getString("user_name")!;
+    });
+  }
+
   _confirmPurchase() async {
     var cartData = await DBProvider.db.getCartItems();
     var total = await DBProvider.db.getTotal();
@@ -880,10 +926,11 @@ class _CheckoutState extends State<Checkout> {
       Response response = await _dio.post(
         url,
         data:
-        "$reqKey=post_order&product=${jsonEncode(cartData).toString()}&billing_details=${jsonEncode(billingInfo).toString()}&"
+            "$reqKey=post_order&product=${jsonEncode(cartData).toString()}&billing_details=${jsonEncode(billingInfo).toString()}&"
             "shipping_details=${jsonEncode(hasBilling == true ? billingInfo : shippingInfo).toString()}&vendor_id=${int.tryParse("1")}&shipping_flag=${int.tryParse('0')}&"
             "shipping_method=$shippingID&payment_method=$paymentID&coupon_code=${_couponDiscount.text}&order_currency=${int.tryParse('142')}&"
-            "order_language='EN'&total_amount=${total[0]['total'] + int.tryParse(shippingPrice)}&order_subtotal=${total[0]['total']}&order_shipment=${int.tryParse(shippingPrice)}",
+            "order_language='EN'&total_amount=${total[0]['total'] + int.tryParse(shippingPrice)}&order_subtotal=${total[0]['total']}&order_shipment=${int.tryParse(shippingPrice)}&"
+            "customer_number=$customerNumber&user_id=$userID&user_name=$userName",
         options: options,
       );
 
@@ -924,7 +971,6 @@ class _CheckoutState extends State<Checkout> {
             phone: phone,
           ),
         );
-
       } else {
         DialogIndicator(context).hideOpenDialog();
 
@@ -933,11 +979,11 @@ class _CheckoutState extends State<Checkout> {
     } on DioError catch (Exception) {
       DialogIndicator(context).hideOpenDialog();
 
-      print('Req Error: $Exception');
+      log('Req Error: $Exception');
     } catch (Exception) {
       DialogIndicator(context).hideOpenDialog();
 
-      print('Something happened: $Exception');
+      log('Something happened: $Exception');
     }
   }
 }

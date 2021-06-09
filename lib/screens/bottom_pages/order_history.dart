@@ -1,6 +1,9 @@
+import 'dart:developer';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:grocery_application/models/history_model.dart';
+import 'package:grocery_application/utilities/config.dart';
 import 'package:grocery_application/utilities/database_utils.dart';
 
 class OrderHistory extends StatefulWidget {
@@ -112,7 +115,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text('${snapshot.data![index].invoiceNumber}',
+                                      Text('${snapshot.data![index].invoiceNumber}'.toUpperCase(),
                                         style: TextStyle(
                                           color: Colors.grey[800],
                                           fontSize: appHeight * 0.020,
@@ -155,4 +158,5 @@ class _OrderHistoryState extends State<OrderHistory> {
       ),
     );
   }
+
 }
